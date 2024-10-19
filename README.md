@@ -6,6 +6,7 @@ Canonical Snap for Prowlarr\
 https://snapcraft.io/prowlarr-tak
 
 ## Prowlarr Description
+<img src="/icon.svg" width="100">
 Prowlarr is an indexer manager/proxy built on the popular *arr .net/reactjs base stack to integrate with your various PVR apps.
 Prowlarr supports management of both Torrent Trackers and Usenet Indexers. 
 It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr 
