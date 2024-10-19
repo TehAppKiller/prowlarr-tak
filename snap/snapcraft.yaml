@@ -21,18 +21,15 @@ description: |
 
   sudo snap connect prowlarr-tak:mount-observe
   
-  **Post install commands required to access home folder :**
-  
-  sudo snap connect prowlarr-tak:home
-  
   **!!! Files can only be written in a directory owned by 'root' !!!**
+  **!!! Home base directory content is not readable !!!**
   
-  This is due to current behavior and restrictions of snaps running as daemon by Canonical.\
-  Check documentation on GitHub: https://github.com/TehAppKiller/prowlarr-tak
+  This is due to current behavior and restrictions of snaps by Canonical.\
+  Check documentation if you want to setup data in /home directory: https://github.com/TehAppKiller/Snapcraft-common-doc/blob/main/README.md#FAQ
 website: https://prowlarr.com
 source-code: https://github.com/TehAppKiller/prowlarr-tak
 issues: https://github.com/TehAppKiller/prowlarr-tak/issues
-contact: tehappkiller@proton.me
+contact: mailto:tehappkiller@proton.me
 donation: https://whydonate.com/en/fundraising/help-teh-devz
 license: MIT
 icon: icon.svg
@@ -55,11 +52,7 @@ apps:
       - network
       - network-bind
       - removable-media
-      - home
-      
-plugs:
-  home:
-    read: all
+      - home # useless for now ; if snaps are allowed to read /home folder one day...
 
 parts:
   prowlarr:
