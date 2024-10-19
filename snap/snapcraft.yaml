@@ -1,0 +1,147 @@
+name: prowlarr-tak
+summary: UnOfficial release of Prowlarr
+description: |
+  **Prowlarr is an indexer manager/proxy built on the popular *arr .net/reactjs base stack to integrate with your various PVR apps.**
+  Prowlarr supports management of both Torrent Trackers and Usenet Indexers. 
+  It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr 
+  offering complete management of your indexers 
+  with no per app Indexer setup required (we do it all).
+  
+  * The web interface is accessible by default at http://localhost:9696
+  * See https://prowlarr.com for more details.
+
+
+  **Prowlarr Release 1+**
+  * Core20 is still required for dependencies
+  * Service is restarted on any condition.
+
+  **Post install commands required to access media folders and see resources :**
+
+  sudo snap connect prowlarr-tak:removable-media
+
+  sudo snap connect prowlarr-tak:mount-observe
+  
+  **Post install commands required to access home folder :**
+  
+  sudo snap connect prowlarr-tak:home
+  
+  **!!! Files can only be written in a directory owned by 'root' !!!**
+  
+  This is due to current behavior and restrictions of snaps running as daemon by Canonical.\
+  Check documentation on GitHub: https://github.com/TehAppKiller/prowlarr-tak
+website: https://prowlarr.com
+source-code: https://github.com/TehAppKiller/prowlarr-tak
+issues: https://github.com/TehAppKiller/prowlarr-tak/issues
+contact: tehappkiller@proton.me
+donation: https://whydonate.com/en/fundraising/help-teh-devz
+license: MIT
+icon: icon.svg
+grade: stable
+confinement: strict
+base: core20
+adopt-info: prowlarr
+architectures:
+  - build-on: [amd64]
+  - build-on: [arm64]
+  - build-on: [armhf]
+
+apps:
+  prowlarr:
+    command: bin/run-prowlarr.sh
+    daemon: simple
+    restart-condition: always
+    plugs:
+      - mount-observe
+      - network
+      - network-bind
+      - removable-media
+      - home
+      
+plugs:
+  home:
+    read: all
+
+parts:
+  prowlarr:
+    plugin: nil
+    source: .
+    override-pull: |
+      # Architecture
+      case "$SNAPCRAFT_TARGET_ARCH" in
+        amd64) SRC_ARCH="x64" ;;
+        arm64) SRC_ARCH="arm64" ;;
+        armhf) SRC_ARCH="arm" ;;
+      esac
+
+      # Pull
+      rm -rf $SNAPCRAFT_PART_SRC/{,.[!.],..?}*
+      wget "http://prowlarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=$SRC_ARCH" -O srcfile
+      tar xvf srcfile
+
+      snapcraftctl pull
+    override-build: |
+      # Architecture
+      case "$SNAPCRAFT_TARGET_ARCH" in
+        amd64) SRC_ARCH="x64" ;;
+        arm64) SRC_ARCH="arm64" ;;
+        armhf) SRC_ARCH="arm" ;;
+      esac
+
+      # Get Last Source Tag version and Check Snap (with same Source) version
+      src_version=$(curl -sL "http://prowlarr.servarr.com/v1/update/master/changes?os=linux&runtime=netcore&arch=$SRC_ARCH" | sed -nre "s/^[^0-9]*([0-9\.]*).*/\1/p")
+      echo "Source last tag: ${src_version}"
+      snap_last_version=$(curl -sL -H "Snap-Device-Series: 16" "https://api.snapcraft.io/v2/snaps/info/prowlarr-tak?architecture=${SNAPCRAFT_TARGET_ARCH}&fields=version" | sed -nre "s/^.*\"stable\"\,\"track\"\:\"latest\"\}\,\"version\"\:\"([^\"]*)\".*/\1/p");
+      echo "Snap last version: ${snap_last_version}"
+      snap_build_with_same_version=$(echo $snap_last_version | sed -nre "s/^($src_version.*).*/\1/p");
+      # Same version ?
+      if [ -z "$snap_build_with_same_version" ]
+      then
+        new_snap_version="${src_version}";
+      else
+        # Get snap build version
+        snap_build=$(echo $snap_build_with_same_version | sed -nre 's/^.*-v([0-9]*).*/\1/p');
+        # Already a build version ?
+        if [ -z "$snap_build" ]
+        then
+          # init @v2
+          new_snap_build="2";
+        else
+          # increment @v+1
+          new_snap_build=$(($snap_build+1));
+        fi
+
+        new_snap_version="${src_version}-v${new_snap_build}";
+      fi
+
+      snapcraftctl set-version $new_snap_version
+
+      # Build
+      INST_DIR="$SNAPCRAFT_PART_INSTALL/Prowlarr"
+      mkdir -p "$INST_DIR"
+      cp -a Prowlarr/* $INST_DIR
+
+      snapcraftctl build
+    build-packages:
+      - curl
+      - wget
+      - libssl-dev
+    prime:
+      - Prowlarr
+
+  local:
+    plugin: dump
+    source: snap/local
+    override-prime: |
+      snapcraftctl prime
+      chmod +rx $SNAPCRAFT_PRIME/bin/run-prowlarr.sh
+
+  deps:
+    plugin: nil
+    source: .
+    stage-packages:
+      - liblttng-ust0
+      - sqlite3
+      - libicu66
+    stage:
+      - usr/bin/sqlite*
+      - usr/lib
