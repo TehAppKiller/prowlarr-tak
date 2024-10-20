@@ -1,5 +1,7 @@
 # prowlarr-tak
 [![prowlarr-tak](https://snapcraft.io/prowlarr-tak/badge.svg)](https://snapcraft.io/prowlarr-tak)
+![snap arch](https://badgen.net/snapcraft/architecture/prowlarr-tak)
+![snap size](https://badgen.net/snapcraft/size/prowlarr-tak/amd64/stable)
 
 ## Snap Description
 Canonical Snap for Prowlarr\
