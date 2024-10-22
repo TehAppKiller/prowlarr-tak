@@ -15,7 +15,7 @@ It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr
 offering complete management of your indexers 
 with no per app Indexer setup required (we do it all).
 
-See https://prowlarr.video for more details.
+See https://prowlarr.com for more details.
 
 ## Information
 
@@ -31,12 +31,11 @@ sudo snap connect prowlarr-tak:removable-media
 sudo snap connect prowlarr-tak:mount-observe
 ```
 
-Post install commands required to access home folder :
-```
-sudo snap connect prowlarr-tak:home
-```
 **!!! Files can only be written in a directory owned by 'root' !!!**\
-This is due to current behavior and restrictions of snaps running as daemon by Canonical.
+**!!! Home base directory content is not readable !!!**
+
+This is due to current behavior and restrictions of snaps by Canonical.\
+Check common doc in FAQ if you want to setup data in /home directory.
 
 ## FAQ
 See my common doc about [FAQ](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#FAQ).
