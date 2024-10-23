@@ -12,7 +12,6 @@ description: |
 
 
   **Prowlarr Release 1+**
-  * Core20 is still required for dependencies
   * Service is restarted on any condition.
 
   **Post install commands required to access media folders and see resources :**
@@ -35,12 +34,12 @@ license: MIT
 icon: icon.svg
 grade: stable
 confinement: strict
-base: core20
+base: core24
 adopt-info: prowlarr
-architectures:
-  - build-on: [amd64]
-  - build-on: [arm64]
-  - build-on: [armhf]
+platforms:
+  amd64:
+  arm64:
+  armhf:
 
 apps:
   prowlarr:
@@ -55,26 +54,48 @@ apps:
       - home # useless for now ; if snaps are allowed to read /home folder one day...
 
 parts:
+  lttng-ust: # Avoid Core20 dependency
+    source-type: git
+    source: https://github.com/lttng/lttng-ust.git
+    source-tag: v2.12.10
+    source-depth: 1
+    plugin: autotools
+    autotools-configure-parameters:
+      - --prefix=/usr
+      - --libdir=/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
+      - --disable-man-pages
+      - --disable-examples
+    override-build: |
+      ./bootstrap
+      craftctl default
+    build-packages:
+      - liburcu-dev
+      - libnuma-dev
+    prime:
+      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/liblttng-ust*.so*
+      
   prowlarr:
+    after:
+      - lttng-ust
     plugin: nil
     source: .
     override-pull: |
       # Architecture
-      case "$SNAPCRAFT_TARGET_ARCH" in
+      case "$CRAFT_ARCH_BUILD_FOR" in
         amd64) SRC_ARCH="x64" ;;
         arm64) SRC_ARCH="arm64" ;;
         armhf) SRC_ARCH="arm" ;;
       esac
 
       # Pull
-      rm -rf $SNAPCRAFT_PART_SRC/{,.[!.],..?}*
+      rm -rf $CRAFT_PART_SRC/{,.[!.],..?}*
       wget "http://prowlarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=$SRC_ARCH" -O srcfile
       tar xvf srcfile
 
-      snapcraftctl pull
+      craftctl default
     override-build: |
       # Architecture
-      case "$SNAPCRAFT_TARGET_ARCH" in
+      case "$CRAFT_ARCH_BUILD_FOR" in
         amd64) SRC_ARCH="x64" ;;
         arm64) SRC_ARCH="arm64" ;;
         armhf) SRC_ARCH="arm" ;;
@@ -83,7 +104,7 @@ parts:
       # Get Last Source Tag version and Check Snap (with same Source) version
       src_version=$(curl -sL "http://prowlarr.servarr.com/v1/update/master/changes?os=linux&runtime=netcore&arch=$SRC_ARCH" | sed -nre "s/^[^0-9]*([0-9\.]*).*/\1/p")
       echo "Source last tag: ${src_version}"
-      snap_last_version=$(curl -sL -H "Snap-Device-Series: 16" "https://api.snapcraft.io/v2/snaps/info/prowlarr-tak?architecture=${SNAPCRAFT_TARGET_ARCH}&fields=version" | sed -nre "s/^.*\"stable\"\,\"track\"\:\"latest\"\}\,\"version\"\:\"([^\"]*)\".*/\1/p");
+      snap_last_version=$(curl -sL -H "Snap-Device-Series: 16" "https://api.snapcraft.io/v2/snaps/info/prowlarr-tak?architecture=${CRAFT_ARCH_BUILD_FOR}&fields=version" | sed -nre "s/^.*\"stable\"\,\"track\"\:\"latest\"\}\,\"version\"\:\"([^\"]*)\".*/\1/p");
       echo "Snap last version: ${snap_last_version}"
       snap_build_with_same_version=$(echo $snap_last_version | sed -nre "s/^($src_version.*).*/\1/p");
       # Same version ?
@@ -106,14 +127,14 @@ parts:
         new_snap_version="${src_version}-v${new_snap_build}";
       fi
 
-      snapcraftctl set-version $new_snap_version
+       craftctl set version=$new_snap_version
 
       # Build
-      INST_DIR="$SNAPCRAFT_PART_INSTALL/Prowlarr"
+      INST_DIR="$CRAFT_PART_INSTALL/Prowlarr"
       mkdir -p "$INST_DIR"
       cp -a Prowlarr/* $INST_DIR
 
-      snapcraftctl build
+      craftctl default
     build-packages:
       - curl
       - wget
@@ -125,16 +146,17 @@ parts:
     plugin: dump
     source: snap/local
     override-prime: |
-      snapcraftctl prime
-      chmod +rx $SNAPCRAFT_PRIME/bin/run-prowlarr.sh
+      craftctl default
+      chmod +rx $CRAFT_PRIME/bin/run-prowlarr.sh
 
   deps:
     plugin: nil
     source: .
     stage-packages:
-      - liblttng-ust0
+      - liburcu8t64
+      - libnuma1
       - sqlite3
-      - libicu66
-    stage:
+      - libicu74
+    prime:
       - usr/bin/sqlite*
-      - usr/lib
+      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/*.so*
