@@ -40,7 +40,6 @@ Check common doc in FAQ if you want to setup data in /home directory.
 See my common doc about [FAQ](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#FAQ).
 
 ## Building
-The snap requires Core20 for .NET Radarr source dependencies.\
 See my common doc about [building a snap](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#Building).
 ## Versionning
 See my common doc about [versionning](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#Versionning).
