@@ -1,4 +1,5 @@
 name: prowlarr-tak
+title: prowlarr-tak
 summary: UnOfficial release of Prowlarr
 description: |
   **Prowlarr is an indexer manager/proxy built on the popular *arr .net/reactjs base stack to integrate with your various PVR apps.**
@@ -11,7 +12,7 @@ description: |
   * See https://prowlarr.com for more details.
 
 
-  **Prowlarr Release 1+**
+  **Prowlarr Release**
   * Service is restarted on any condition.
 
   **Post install commands required to access media folders and see resources :**
@@ -28,13 +29,13 @@ description: |
 website: https://prowlarr.com
 source-code: https://github.com/TehAppKiller/prowlarr-tak
 issues: https://github.com/TehAppKiller/prowlarr-tak/issues
-contact: mailto:tehappkiller@proton.me
+contact: ['mailto:tehappkiller@proton.me', 'https://mastodon.social/@TehAppKiller']
 donation: https://whydonate.com/en/fundraising/help-teh-devz
 license: MIT
 icon: icon.svg
 grade: stable
 confinement: strict
-base: core24
+base: core26
 adopt-info: prowlarr
 platforms:
   amd64:
@@ -159,7 +160,8 @@ parts:
       - liburcu8t64
       - libnuma1
       - sqlite3
-      - libicu74
+      - libicu78
     prime:
       - usr/bin/sqlite*
       - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/*.so*
+      

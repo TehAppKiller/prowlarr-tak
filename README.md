@@ -21,7 +21,7 @@ See https://prowlarr.com for more details.
 
 The web interface is accessible by default at http://localhost:9696
 
-Prowlarr Release 1+\
+Prowlarr Release\
 Service is restarted on any condition.
 
 Post install commands required to access media folders and see resources :
@@ -37,9 +37,10 @@ This is due to current behavior and restrictions of snaps by Canonical.\
 Check common doc in FAQ if you want to setup data in /home directory.
 
 ## FAQ
-See my common doc about [FAQ](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#FAQ).
+See common doc about [FAQ](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#FAQ).
 
 ## Building
-See my common doc about [building a snap](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#Building).
+See common doc about [building a snap](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#Building).
+
 ## Versionning
-See my common doc about [versionning](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#Versionning).
+See common doc about [versionning](https://github.com/TehAppKiller/Snapcraft-common-doc/tree/main#Versionning).
